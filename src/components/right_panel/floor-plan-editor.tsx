@@ -4,7 +4,7 @@ import { useEditorContext } from '@/context/EditorContext';
 import { useFileContext } from '@/context/FileContext';
 import { Eraser, Pen } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 
 export default function FloorPlanEditor() {
   const { tool, setTool } = useEditorContext(); 

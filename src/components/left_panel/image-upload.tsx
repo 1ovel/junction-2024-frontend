@@ -5,7 +5,7 @@ import { useFileContext } from "@/context/FileContext"
 import { Trash, Upload } from 'lucide-react'
 import { useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { Button } from "./ui/button"
+import { Button } from "../ui/button"
 
 export default function ImageUpload() {
   const { setUploadedFiles, uploadedFiles, removeFile, selectedFile, setSelectedFile } = useFileContext();

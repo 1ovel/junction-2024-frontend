@@ -1,8 +1,8 @@
 'use client'
 
-import FloorPlanEditor from '@/components/floor-plan-editor';
 import FloorPlanWizard from '@/components/floor-plan-wizard';
-import ModelViewer from '@/components/model-viewer';
+import FloorPlanEditor from '@/components/right_panel/floor-plan-editor';
+import ModelViewer from '@/components/right_panel/model-viewer';
 import { useFileContext } from '@/context/FileContext'; // Import the context
 import { useWizardContext } from '@/context/WizardContext';
 

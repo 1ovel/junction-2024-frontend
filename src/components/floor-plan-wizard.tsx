@@ -5,9 +5,9 @@ import { CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/
 import { useFileContext } from "@/context/FileContext"
 import { useWizardContext } from "@/context/WizardContext"
 import { useState } from 'react'
-import ImageUpload from "./image-upload"
-import ModelView from "./model-view"
-import SvgEdit from "./svg-edit"
+import ImageUpload from "./left_panel/image-upload"
+import ModelView from "./left_panel/model-view"
+import SvgEdit from "./left_panel/svg-edit"
 
 const steps = ['Upload Floor Plan', 'Edit SVG', 'View 3D Model']
 
