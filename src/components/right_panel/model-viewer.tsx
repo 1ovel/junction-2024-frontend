@@ -1,13 +1,13 @@
 'use client'
 
-import { useFileContext } from '@/context/FileContext';
+import { useModelContext } from '@/context/ModelContext';
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const ModelViewer: React.FC = () => {
-    const { model, setModel } = useFileContext();
+    const { model, setModel } = useModelContext();
     const divRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
     const loaderRef = useRef<SVGLoader | null>(null);
@@ -25,7 +25,7 @@ const ModelViewer: React.FC = () => {
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0xffffff);
-            const camera = new THREE.PerspectiveCamera(50, divRef.current.clientWidth / divRef.current.clientHeight, 0.1, 5000);
+            const camera = new THREE.PerspectiveCamera(50, divRef.current.clientWidth / divRef.current.clientHeight, 0.1, 10000);
             camera.position.z = 150;
             // camera.position.x = 500;
             // camera.position.y = 500;
