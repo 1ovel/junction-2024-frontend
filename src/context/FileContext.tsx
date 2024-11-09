@@ -12,6 +12,8 @@ interface FileContextType {
   removeFile: (index: number) => void;
   selectedProcessedFile: number | null;
   setSelectedProcessedFile: React.Dispatch<React.SetStateAction<number | null>>;
+  setModel: React.Dispatch<React.SetStateAction<File | null>>;
+  model: File | null;
 }
 
 const FileContext = createContext<FileContextType | undefined>(undefined);
@@ -21,6 +23,7 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [processedFiles, setProcessedFiles] = useState<File[] | null>(null);
   const [selectedProcessedFile, setSelectedProcessedFile] = useState<number | null>(0); 
   const [selectedFile, setSelectedFile] = useState<number | null>(null);
+  const [model, setModel] = useState<File | null>(null);
 
   useEffect(() => {
     if (uploadedFiles && uploadedFiles.length > 0) {
@@ -36,7 +39,7 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   return (
-    <FileContext.Provider value={{ uploadedFiles, setUploadedFiles, removeFile, selectedFile, setSelectedFile, processedFiles, setProcessedFiles, selectedProcessedFile, setSelectedProcessedFile }}>
+    <FileContext.Provider value={{ uploadedFiles, setUploadedFiles, removeFile, selectedFile, setSelectedFile, processedFiles, setProcessedFiles, selectedProcessedFile, setSelectedProcessedFile, model, setModel }}>
       {children}
     </FileContext.Provider>
   );
