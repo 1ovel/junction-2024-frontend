@@ -4,6 +4,7 @@ import { useFileContext } from '@/context/FileContext';
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const ModelViewer: React.FC = () => {
     const { model, setModel } = useFileContext();
@@ -23,17 +24,27 @@ const ModelViewer: React.FC = () => {
             const { width, height } = divRef.current.getBoundingClientRect();
 
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, 1, 1, 1000);
-            const renderer = new THREE.WebGLRenderer();
+            scene.background = new THREE.Color(0xffffff);
+            const camera = new THREE.PerspectiveCamera(50, divRef.current.clientWidth / divRef.current.clientHeight, 0.1, 5000);
+            camera.position.z = 150;
+            // camera.position.x = 500;
+            // camera.position.y = 500;
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
             const loader = new SVGLoader();
             loaderRef.current = loader;
             renderer.setSize(width, height);
             divRef.current.appendChild(renderer.domElement);
 
-            camera.position.z = 5;
+
+            const light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(0, 1, 1).normalize();
+            scene.add(light);
+
+            const controls = new OrbitControls(camera, renderer.domElement); // Initialize OrbitControls
 
             const animate = () => {
                 requestAnimationFrame(animate);
+                controls.update(); // Update controls on each frame
                 renderer.render(scene, camera);
             };
             animate();
@@ -55,12 +66,12 @@ const ModelViewer: React.FC = () => {
             const svgText = event.target?.result as string;
             const paths = loaderRef.current!.parse(svgText).paths;
 
-            console.log(svgText);
+            console.log(paths); // Debugging: Check if paths are loaded
 
-            // Clear previous SVG objects
-            // scene.clear();
-            // scene.add(camera);
-            // scene.add(light);
+            // Clear previous meshes before adding new ones
+            while (sceneRef.current!.children.length > 0) {
+                sceneRef.current!.remove(sceneRef.current!.children[0]);
+            }
 
             // Loop through each path in the SVG and extrude
             paths.forEach((path: any) => {
@@ -79,8 +90,7 @@ const ModelViewer: React.FC = () => {
                     const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
                     const material = new THREE.MeshStandardMaterial({ color: 0x156289, emissive: 0x072534 });
                     const mesh = new THREE.Mesh(geometry, material);
-                    mesh.position.set(0, 0, 100);
-                    mesh.geometry.scale;
+                    mesh.position.set(0, 0, 100); // Adjust position if necessary
 
                     sceneRef.current!.add(mesh);
                 });
