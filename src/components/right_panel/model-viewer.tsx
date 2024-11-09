@@ -1,13 +1,13 @@
 'use client'
 
 import { useModelContext } from '@/context/ModelContext';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const ModelViewer: React.FC = () => {
-    const { model, setModel } = useModelContext();
+    const { model, setModel, numberOfFloors, setNumberOfFloors } = useModelContext();
     const divRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
     const loaderRef = useRef<SVGLoader | null>(null);
@@ -16,6 +16,7 @@ const ModelViewer: React.FC = () => {
         const file = event.target.files?.[0];
         if (file) {
             setModel(file); // Update the model state with the selected file
+            setNumberOfFloors(numberOfFloors + 1)
         }
     };
 
@@ -69,13 +70,15 @@ const ModelViewer: React.FC = () => {
             console.log(paths); // Debugging: Check if paths are loaded
 
             // Clear previous meshes before adding new ones
-            while (sceneRef.current!.children.length > 0) {
-                sceneRef.current!.remove(sceneRef.current!.children[0]);
-            }
+            // while (sceneRef.current!.children.length > 0) {
+            //     sceneRef.current!.remove(sceneRef.current!.children[0]);
+            // }
 
-            // Loop through each path in the SVG and extrude
+            const group = new THREE.Group();
+
             paths.forEach((path: any) => {
                 const shapes = path.toShapes(true);
+
 
                 shapes.forEach((shape: any) => {
                     const extrudeSettings = {
@@ -89,12 +92,17 @@ const ModelViewer: React.FC = () => {
 
                     const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
                     const material = new THREE.MeshStandardMaterial({ color: 0x156289, emissive: 0x072534 });
+                    material.transparent = true;
+                    material.opacity = 0.7;
                     const mesh = new THREE.Mesh(geometry, material);
-                    mesh.position.set(0, 0, 100); // Adjust position if necessary
+                    mesh.position.set(0, 0, numberOfFloors * 100);
 
-                    sceneRef.current!.add(mesh);
+                    // scene.add(mesh);
+                    group.add(mesh);
                 });
             });
+
+            sceneRef.current.add(group);
         };
 
         reader.readAsText(model); // Read the model file as text
