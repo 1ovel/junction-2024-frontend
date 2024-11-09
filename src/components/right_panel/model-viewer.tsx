@@ -3,7 +3,6 @@
 import { useModelContext } from '@/context/ModelContext';
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-// @ts-ignore
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
