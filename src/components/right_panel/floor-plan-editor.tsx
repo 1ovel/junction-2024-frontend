@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/button';
 
 export default function FloorPlanEditor() {
-  const { tool, setTool } = useEditorContext(); 
+  const { tool, setTool, brushSize } = useEditorContext(); 
   const { selectedProcessedFile, processedFiles, setSelectedProcessedFile } = useFileContext(); 
   const [image, setImage] = useState<any>(null);
   const [drawing, setDrawing] = useState(false); // Track if the user is currently drawing
@@ -57,7 +57,7 @@ export default function FloorPlanEditor() {
 
     // Set the drawing style
     ctx.strokeStyle = tool === "draw" ? 'black': 'white'; // Line color
-    ctx.lineWidth = 5; // Line width
+    ctx.lineWidth = brushSize; // Line width
     ctx.lineCap = 'round'; // Rounded line ends
     ctx.beginPath();
     ctx.moveTo(position.x, position.y);

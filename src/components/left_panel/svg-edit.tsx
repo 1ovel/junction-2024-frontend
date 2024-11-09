@@ -1,40 +1,36 @@
+import { useEditorContext } from '@/context/EditorContext';
 import { useFileContext } from '@/context/FileContext';
-import { useEffect, useState } from 'react';
+import { Slider } from '../ui/slider';
 
 export default function SvgEdit({ svgData, onSvgEdit }: { svgData: string | null, onSvgEdit: (svg: string) => void }) {
   const { processedFiles, setSelectedProcessedFile, selectedProcessedFile } = useFileContext();
-  
-  const [editedSvg, setEditedSvg] = useState(svgData)
-
-  useEffect(() => {
-    if (!svgData) {
-      // Simulating server response with a placeholder SVG
-      const placeholderSvg = `
-        <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-          <rect width="200" height="200" fill="#f0f0f0" />
-          <text x="100" y="100" font-family="Arial" font-size="16" text-anchor="middle">
-            Floor Plan SVG
-          </text>
-        </svg>
-      `
-      setEditedSvg(placeholderSvg)
-    }
-  }, [svgData])
-
-  const handleSvgChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setEditedSvg(event.target.value)
-  }
-
-  const handleSave = () => {
-    if (editedSvg) {
-      onSvgEdit(editedSvg)
-      alert('SVG saved successfully!')
-    }
-  }
+  const { brushSize, setBrushSize } = useEditorContext();
 
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-semibold">Edit Processed Floor Plans</h2>
+
+      <div className="w-full space-y-4">
+          <div className="flex items-center justify-between">
+            <label htmlFor="slider" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Brush size
+            </label>
+            <span className="w-12 rounded-md border border-transparent px-2 py-0.5 text-right text-md font-bold text-muted-foreground hover:border-border">
+              {brushSize}
+            </span>
+          </div>
+          <Slider
+            id="slider"
+            max={100}
+            min={1}
+            step={1}
+            className="w-full"
+            value={[brushSize]}
+            onValueChange={value => setBrushSize(value[0])}
+            aria-label="Slider"
+          />
+        </div>
+      
       {processedFiles && processedFiles.length > 0 && (
         <div className="flex flex-col space-y-2" >
             <h4 className="text-md">Floors</h4>
