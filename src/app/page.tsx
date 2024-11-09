@@ -2,6 +2,7 @@
 
 import FloorPlanEditor from '@/components/floor-plan-editor';
 import FloorPlanWizard from '@/components/floor-plan-wizard';
+import ModelViewer from '@/components/model-viewer';
 import { useFileContext } from '@/context/FileContext'; // Import the context
 import { useWizardContext } from '@/context/WizardContext';
 
@@ -11,11 +12,11 @@ export default function Home() {
 
 
   return (
-    <main className="flex min-h-screen bg-background text-foreground dark h-full">
+    <main className="flex min-h-screen bg-background text-foreground dark h-full max-h-screen">
       <div className="w-full md:w-1/2 p-4 md:p-8 overflow-y-auto border-r border-border flex flex-col">
         <FloorPlanWizard />
       </div>
-      <div className="w-1/2 p-4 flex flex-col items-center justify-center h-full min-h-screen">
+      <div className="w-1/2 p-4 flex flex-col items-center justify-center h-full min-h-screen max-h-screen">
         {currentPage === 0 && selectedFile !== null && uploadedFiles && uploadedFiles[selectedFile] ? (
           <img 
             src={URL.createObjectURL(uploadedFiles[selectedFile])}
@@ -26,7 +27,11 @@ export default function Home() {
           <>
             <FloorPlanEditor />
           </>
-        ) : (
+        ) : currentPage === 2 ? (
+          <>
+            <ModelViewer />
+          </>
+        ): (
           <></>
         )}
       </div>
