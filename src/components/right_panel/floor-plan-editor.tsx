@@ -8,6 +8,7 @@ import { Button } from '../ui/button';
 
 export default function FloorPlanEditor() {
         const { tool, setTool, brushSize } = useEditorContext();
+        const divRef = useRef<HTMLDivElement>(null);
         const { selectedProcessedFile, processedFiles, setSelectedProcessedFile } = useFileContext();
         const [image, setImage] = useState<any>(null);
         const [drawing, setDrawing] = useState(false); // Track if the user is currently drawing
@@ -32,10 +33,10 @@ export default function FloorPlanEditor() {
                 img.src = dataUrl;
                 img.onload = () => {
                         const scaleFactor = canvas.width / img.width;
-                        const newHeight = img.height * scaleFactor;
-
-                        canvas.width = img.width; // Set canvas width
-                        canvas.height = newHeight; // Set canvas height based on scaling factor
+                        const newHeight = divRef.current?.clientHeight;
+                        
+                        canvas.width = divRef.current?.clientWidth; // Set canvas width
+                        canvas.height = divRef.current?.clientHeight; // Set canvas height based on scaling factor
 
                         // Draw the image on the canvas
                         ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
@@ -58,13 +59,12 @@ export default function FloorPlanEditor() {
                                 const canvas = canvasRef.current;
                                 const ctx = canvas.getContext('2d');
 
-                                const scaleFactor = canvas.width / img.width;
-                                const newHeight = img.height * scaleFactor;
+                                const scaleFactor = divRef.current!.clientWidth / img.width;
 
-                                canvas.width = img.width; // Set canvas width
-                                canvas.height = newHeight; // Set canvas height
+                                canvas.width = img.width * scaleFactor; // Set canvas width
+                                canvas.height = divRef.current?.clientHeight; // Set canvas height
 
-                                ctx.drawImage(img, 0, 0, canvas.width, newHeight);
+                                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                                 // Save the canvas content as a data URL
                                 images.current[selectedProcessedFile] = canvas.toDataURL();
@@ -138,7 +138,7 @@ export default function FloorPlanEditor() {
         // };
 
         return (
-                <div className='w-full h-full'>
+                <>
                         <div className='w-full flex gap-2 pb-5'>
                                 <Button size="icon" variant={tool === "draw" ? "default" : "outline"} onClick={() => setTool("draw")}>
                                         <Pen className="w-4 h-4" />
@@ -148,6 +148,7 @@ export default function FloorPlanEditor() {
                                         <Eraser className="w-4 h-4" />
                                 </Button>
                         </div>
+                        <div className='w-full flex-grow h-full' ref={divRef}>
                         <canvas
                                 ref={canvasRef}
                                 onMouseDown={startDrawing}
@@ -160,6 +161,8 @@ export default function FloorPlanEditor() {
                                 style={{ border: '1px solid #000' }}
                                 className="w-full"
                         />
-                </div>
+                        </div>
+                        
+                </>
         );
 }

@@ -20,7 +20,7 @@ export default function ImageUpload() {
     onDrop,
     accept: {
       'image/png': ['.png'],
-      'image/svg': ['.svg']
+      'image/svg+xml': ['.svg']
     },
     multiple: true,
   })

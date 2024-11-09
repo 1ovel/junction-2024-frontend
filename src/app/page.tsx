@@ -16,12 +16,12 @@ export default function Home() {
       <div className="w-1/2 md:w-1/2 p-4 md:p-8 overflow-y-auto border-r border-border flex flex-col">
         <FloorPlanWizard />
       </div>
-      <div className="w-full bg-white p-4 flex flex-col items-center justify-center h-full min-h-screen max-h-screen">
+      <div className="w-full bg-white p-4 flex flex-col items-center justify-center max-h-screen">
         {currentPage === 0 && selectedFile !== null && uploadedFiles && uploadedFiles[selectedFile] ? (
           <img 
             src={URL.createObjectURL(uploadedFiles[selectedFile])}
             alt="Selected File"
-            className="max-w-full h-auto rounded-md"
+            className="max-w-full h-full rounded-md"
           />
         ) : currentPage === 1 ? (
           <>
