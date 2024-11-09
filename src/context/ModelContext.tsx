@@ -15,8 +15,8 @@ const ModelContext = createContext<ModelContextType | undefined>(undefined);
 
 export const ModelProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [model, setModel] = useState<File | null>(null);
-  const [numberOfFloors, setNumberOfFloors] = useState<number>(1)
-  const [floorHeight, setFloorHeight] = useState<number>(10)
+  const [numberOfFloors, setNumberOfFloors] = useState<number>(0)
+  const [floorHeight, setFloorHeight] = useState<number>(20)
 
   return (
     <ModelContext.Provider value={{ model, setModel, numberOfFloors, setNumberOfFloors, floorHeight, setFloorHeight }}>

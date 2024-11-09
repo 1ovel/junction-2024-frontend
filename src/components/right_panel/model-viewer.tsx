@@ -7,10 +7,12 @@ import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const ModelViewer: React.FC = () => {
-    const { model, setModel, numberOfFloors, setNumberOfFloors } = useModelContext();
+    const { model, setModel, numberOfFloors, setNumberOfFloors, floorHeight } = useModelContext();
     const divRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
     const loaderRef = useRef<SVGLoader | null>(null);
+
+    const scaledFloorHeight = floorHeight;
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -19,6 +21,9 @@ const ModelViewer: React.FC = () => {
             setNumberOfFloors(numberOfFloors + 1)
         }
     };
+
+    const [floorGroups, setFloorGroups] = useState<THREE.Group[]>([]);
+
 
     useEffect(() => {
         if (divRef.current && !sceneRef.current) {
@@ -42,6 +47,7 @@ const ModelViewer: React.FC = () => {
             scene.add(light);
 
             const controls = new OrbitControls(camera, renderer.domElement); // Initialize OrbitControls
+
 
             const animate = () => {
                 requestAnimationFrame(animate);
@@ -97,16 +103,25 @@ const ModelViewer: React.FC = () => {
                     const mesh = new THREE.Mesh(geometry, material);
                     mesh.position.set(0, 0, numberOfFloors * 100);
 
-                    // scene.add(mesh);
                     group.add(mesh);
                 });
             });
 
             sceneRef.current.add(group);
+            setFloorGroups([...floorGroups, group]);
         };
 
         reader.readAsText(model); // Read the model file as text
     }, [model]);
+
+    useEffect(() => {
+        console.log(scaledFloorHeight);
+        console.log(sceneRef.current);
+
+        if (sceneRef.current) {
+            sceneRef.current!.scale.set(1, 1, -scaledFloorHeight);
+        }
+    }, [scaledFloorHeight]);
 
     return (
         <>
