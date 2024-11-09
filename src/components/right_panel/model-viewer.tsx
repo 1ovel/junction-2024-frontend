@@ -1,7 +1,7 @@
 'use client'
 
 import { useModelContext } from '@/context/ModelContext';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -102,7 +102,7 @@ const ModelViewer: React.FC = () => {
                 });
             });
 
-            sceneRef.current.add(group);
+            sceneRef.current!.add(group);
         };
 
         reader.readAsText(model); // Read the model file as text
