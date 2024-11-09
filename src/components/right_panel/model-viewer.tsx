@@ -1,16 +1,17 @@
 'use client'
 
 import { useModelContext } from '@/context/ModelContext';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const ModelViewer: React.FC = () => {
     const { model, setModel, numberOfFloors, setNumberOfFloors, floorHeight } = useModelContext();
     const divRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
     const loaderRef = useRef<SVGLoader | null>(null);
+    const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
 
     const scaledFloorHeight = floorHeight;
 
@@ -22,9 +23,6 @@ const ModelViewer: React.FC = () => {
         }
     };
 
-    const [floorGroups, setFloorGroups] = useState<THREE.Group[]>([]);
-
-
     useEffect(() => {
         if (divRef.current && !sceneRef.current) {
             const { width, height } = divRef.current.getBoundingClientRect();
@@ -33,6 +31,7 @@ const ModelViewer: React.FC = () => {
             scene.background = new THREE.Color(0xffffff);
             const camera = new THREE.PerspectiveCamera(50, divRef.current.clientWidth / divRef.current.clientHeight, 0.1, 10000);
             camera.position.z = 150;
+            cameraRef.current = camera;
             // camera.position.x = 500;
             // camera.position.y = 500;
             const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -47,6 +46,9 @@ const ModelViewer: React.FC = () => {
             scene.add(light);
 
             const controls = new OrbitControls(camera, renderer.domElement); // Initialize OrbitControls
+            controls.enableRotate = true;
+            controls.enablePan = false;
+            controls.target.set(0, 0, 0);
 
 
             const animate = () => {
@@ -107,8 +109,8 @@ const ModelViewer: React.FC = () => {
                 });
             });
 
-            sceneRef.current.add(group);
-            setFloorGroups([...floorGroups, group]);
+            sceneRef.current!.add(group);
+            cameraRef.current?.lookAt(group.position);
         };
 
         reader.readAsText(model); // Read the model file as text
@@ -119,7 +121,7 @@ const ModelViewer: React.FC = () => {
         console.log(sceneRef.current);
 
         if (sceneRef.current) {
-            sceneRef.current!.scale.set(1, 1, -scaledFloorHeight);
+            sceneRef.current!.scale.set(1, 1, scaledFloorHeight);
         }
     }, [scaledFloorHeight]);
 
