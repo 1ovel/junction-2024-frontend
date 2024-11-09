@@ -1,3 +1,6 @@
+import { EditorProvider } from "@/context/EditorContext";
+import { FileProvider } from "@/context/FileContext";
+import { WizardProvider } from "@/context/WizardContext";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -25,10 +28,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <WizardProvider>
+        <EditorProvider>
+        <FileProvider>
+          {children}
+        </FileProvider>
+        </EditorProvider>
+        </WizardProvider>
       </body>
     </html>
   );
