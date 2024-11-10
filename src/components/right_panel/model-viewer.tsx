@@ -8,7 +8,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { useFileContext } from '@/context/FileContext';
 
 const ModelViewer: React.FC = () => {
-    const { model, setModel, numberOfFloors, setNumberOfFloors, floorHeight, setFloorGroups, floorGroups } = useModelContext();
+    const { object3d, setObject3d, model, setModel, numberOfFloors, setNumberOfFloors, floorHeight, setFloorGroups, floorGroups } = useModelContext();
     const { finalSvgs, serverReturned } = useFileContext();
     const divRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
@@ -19,13 +19,13 @@ const ModelViewer: React.FC = () => {
 
     const scaledFloorHeight = floorHeight;
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            setModel(file); // Update the model state with the selected file
-            setNumberOfFloors(numberOfFloors + 1)
-        }
-    };
+    // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const file = event.target.files?.[0];
+    //     if (file) {
+    //         setModel(file); // Update the model state with the selected file
+    //         setNumberOfFloors(numberOfFloors + 1)
+    //     }
+    // };
 
     useEffect(() => {
         if (divRef.current && !sceneRef.current) {
@@ -33,8 +33,14 @@ const ModelViewer: React.FC = () => {
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0xffffff);
-            const camera = new THREE.PerspectiveCamera(50, divRef.current.clientWidth / divRef.current.clientHeight, 0.1, 10000);
-            camera.position.z = 150;
+            const camera = new THREE.PerspectiveCamera(50, divRef.current.clientWidth / divRef.current.clientHeight, 0.1, 10000);camera.position.set(-249.21088839875534, -669.2944115862374, 1495.0210107106598);
+            // Set camera rotation
+            camera.rotation.set(
+              1.034004350470264,
+              -0.4502496519920817,
+              -0.2534047815947666,
+              'XYZ'
+            );
             cameraRef.current = camera;
             // camera.position.x = 500;
             // camera.position.y = 500;
@@ -52,7 +58,7 @@ const ModelViewer: React.FC = () => {
             const controls = new OrbitControls(camera, renderer.domElement); // Initialize OrbitControls
             // controls.minAzimuthAngle = -Math.PI / 2; // Limit the rotation of the camera
             // controls.maxAzimuthAngle = -Math.PI / 2; // Limit the rotation of the camera
-            cameraRef.current.up.set(0, 0, -1);
+            cameraRef.current.up.set(0, 0, 1);
 
             // controls.minPolarAngle = -Math.PI / 2; // Limit the rotation of the camera
             // controls.maxPolarAngle = -Math.PI / 2; // Limit the rotation of the camera
@@ -93,7 +99,9 @@ const ModelViewer: React.FC = () => {
     useEffect(() => {
         if (!serverReturned) return;
 
-        finalSvgs.current.forEach((svg) => {
+        let groups: THREE.Group[] = [];
+
+        finalSvgs.current.forEach((svg, idx) => {
             console.log(svg);
             const paths = loaderRef.current!.parse(svg).paths;
 
@@ -107,7 +115,7 @@ const ModelViewer: React.FC = () => {
 
                 shapes.forEach((shape: any) => {
                     const extrudeSettings = {
-                        depth: 100,
+                        depth: 50,
                         bevelEnabled: true,
                         bevelSegments: 2,
                         steps: 2,
@@ -120,44 +128,41 @@ const ModelViewer: React.FC = () => {
                     material.transparent = true;
                     material.opacity = 0.7;
                     const mesh = new THREE.Mesh(geometry, material);
-                    mesh.position.set(0, 0, numberOfFloors * 100);
+                    mesh.position.set(0, 0, (idx + 1) * 50);
 
                     group.add(mesh);
                 });
             });
 
-            setFloorGroups([...floorGroups, group]);
-            sceneRef.current!.add(group);
-            const bb = new THREE.Box3().setFromObject(group);
-            const mp = group.children.map((child) => child.position.z).reduce((a, b) => a + b, 0) / group.children.length;
-            console.log(mp);
-            cameraRef.current?.position.set(-100, -100, mp);
-            cameraRef.current?.lookAt(new THREE.Vector3(0, 0, mp));
-            cameraRef.current?.updateProjectionMatrix();
+            groups.push(group);
+            sceneRef.current!.add(...groups);
+            const bb = new THREE.Box3().setFromObject(sceneRef.current!);
+            let a = new THREE.Vector3();
+            bb.getCenter(a)
+            cameraRef.current?.lookAt(a);
             controlsRef.current?.update();
             console.log(cameraRef.current?.position);
             console.log(cameraRef.current?.rotation);
 
             // reader.readAsText(model); // Read the model file as text
+            setObject3d(sceneRef.current!);
         });
+
+        setFloorGroups(groups);
     }, [serverReturned]);
 
     useEffect(() => {
         console.log(scaledFloorHeight);
         console.log(sceneRef.current);
-
+        
         if (sceneRef.current) {
             sceneRef.current!.scale.set(1, 1, scaledFloorHeight);
         }
     }, [scaledFloorHeight]);
 
     return (
-        <>
-
-            <input type="file" accept=".svg" onChange={handleFileChange} />
-            <div className='w-full flex-grow h-full' ref={divRef} />
-        </>
-
+        
+        <div className='w-full flex-grow h-full' ref={divRef} />
     );
 };
 
