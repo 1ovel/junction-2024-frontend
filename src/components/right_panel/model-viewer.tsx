@@ -49,7 +49,7 @@ const ModelViewer: React.FC = () => {
             const loader = new SVGLoader();
             loaderRef.current = loader;
             renderer.setSize(width, height);
-            divRef.current.appendChild(renderer.domElement);
+            divRef.current.replaceChild(renderer.domElement, divRef.current.querySelector('canvas')!);
 
 
             const light = new THREE.DirectionalLight(0xffffff, 1);
@@ -163,7 +163,9 @@ const ModelViewer: React.FC = () => {
 
     return (
         
-        <div className='w-full flex-grow h-full' ref={divRef} />
+        <div className='w-full flex-grow h-full' ref={divRef}>
+            <canvas />
+        </div>
     );
 };
 
