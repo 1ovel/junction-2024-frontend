@@ -16,11 +16,10 @@ export default function ModelView() {
           <div className="flex flex-col space-y-2" >
             <h4 className="text-md">Floors</h4>
             {floorGroups.map((group, index) => (
-              <div key={index} onClick={() => { floorGroups[index].visible = !floorGroups[index].visible; setFloorGroups(floorGroups) }} className={`flex items-center justify-between p-2 bg-muted rounded-md cursor-pointer ${floorGroups[index].visible ? 'ring-2 ring-blue-500' : 'border-none'}`}
+              <div key={index} onClick={() => { floorGroups[index].visible = !floorGroups[index].visible; setFloorGroups([...floorGroups]) }} className={`flex items-center justify-between p-2 bg-muted rounded-md cursor-pointer ${floorGroups[index].visible ? 'ring-2 ring-blue-500' : 'border-none'}`}
               >
-                {floorGroups[index].visible ? 'Hide' : 'Show'}1
                 <div className="flex items-center space-x-3 pl-2">
-                  <span className="text-2xl font-bold text-blue-500 font-medium">{index + 1}</span>
+                  <span className={`text-2xl font-bold ${floorGroups[index].visible ? 'text-blue-500' : 'text-gray-500'} font-medium`}>{index + 1}</span>
                 </div>
               </div>
             ))}

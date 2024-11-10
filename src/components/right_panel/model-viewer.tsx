@@ -109,7 +109,7 @@ const ModelViewer: React.FC = () => {
 
                 shapes.forEach((shape: any) => {
                     const extrudeSettings = {
-                        depth: 100,
+                        depth: 50,
                         bevelEnabled: true,
                         bevelSegments: 2,
                         steps: 2,
