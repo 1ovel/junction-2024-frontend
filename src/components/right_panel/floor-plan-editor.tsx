@@ -51,6 +51,7 @@ export default function FloorPlanEditor() {
                 if (images.current[selectedProcessedFile] != null) {
                         // Use saved canvas data URL if it exists
                         setCanvasFromData(images.current[selectedProcessedFile]);
+
                 } else {
                         // Load image from file and save it
                         const img = new Image();
@@ -109,7 +110,9 @@ export default function FloorPlanEditor() {
                                 // Display the final image on the canvas and save it as a data URL
                                 cv.imshow(canvas, closed);
                                 images.current[selectedProcessedFile] = canvas.toDataURL();
+    var dataURL = canvas.toDataURL();
 
+    // Convert the canvas data URL to an SVG string
                                 // Free the remaining Mats
                                 dest.delete();
                                 closed.delete();
@@ -184,7 +187,7 @@ export default function FloorPlanEditor() {
 
         return (
                 <>
-                        <div className='w-full flex gap-2 pb-5'>
+                        <div className='w-full flex gap-2 pb-5 sticky top-4'>
                                 <Button size="icon" variant={tool === "draw" ? "default" : "outline"} onClick={() => setTool("draw")}>
                                         <Pen className="w-4 h-4" />
                                 </Button>
