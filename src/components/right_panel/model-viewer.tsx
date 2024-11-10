@@ -1,11 +1,11 @@
 'use client'
 
-import { useModelContext } from '@/context/ModelContext';
-import React, { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
-import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { useFileContext } from '@/context/FileContext';
+import { useModelContext } from '@/context/ModelContext';
+import React, { useEffect, useRef } from 'react';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 
 const ModelViewer: React.FC = () => {
     const { object3d, setObject3d, model, setModel, numberOfFloors, setNumberOfFloors, floorHeight, setFloorGroups, floorGroups } = useModelContext();
@@ -29,6 +29,7 @@ const ModelViewer: React.FC = () => {
 
     useEffect(() => {
         if (divRef.current && !sceneRef.current) {
+            console.log('Initializing Three.js in production');
             const { width, height } = divRef.current.getBoundingClientRect();
 
             const scene = new THREE.Scene();
