@@ -8,6 +8,8 @@ import { useState } from 'react'
 import ImageUpload from "./left_panel/image-upload"
 import ModelView from "./left_panel/model-view"
 import SvgEdit from "./left_panel/svg-edit"
+import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
+import { useModelContext } from "@/context/ModelContext"
 
 const steps = ['Upload Floor Plan', 'Edit SVG', 'View 3D Model']
 
@@ -16,6 +18,7 @@ export default function FloorPlanWizard() {
   const { uploadedFiles, setProcessedFiles } = useFileContext();
   const { finalSvgs, rasterizedImages, setServerReturned } = useFileContext();
   const [svgData, setSvgData] = useState<string | null>(null)
+  const { object3d } = useModelContext();
 
   const submitRasterized = () => {
     const formData = new FormData();
@@ -72,6 +75,22 @@ export default function FloorPlanWizard() {
     setCurrentPage((prev) => Math.max(prev - 1, 0))
   }
 
+  const saveTextToFile = (text: string, filename: string) => {
+    const blob = new Blob([text], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(link.href); // Clean up after download
+  };
+
+  // Usage
+  const handleExport = () => {
+    const obje = new OBJExporter();
+    const parsedString: String = obje.parse(object3d!);
+    saveTextToFile(parsedString, 'bimify.obj');
+  }
+
   const renderStep = () => {
     switch (currentPage) {
       case 0:
@@ -114,8 +133,8 @@ export default function FloorPlanWizard() {
         <Button onClick={handleBack} disabled={currentPage === 0}>
           Back
         </Button>
-        <Button onClick={handleNext} disabled={currentPage === steps.length - 1 || (currentPage === 0 && !uploadedFiles) || (currentPage === 0 && !!uploadedFiles && uploadedFiles.length === 0)}>
-          {currentPage === steps.length - 1 ? 'Finish' : 'Next'}
+        <Button onClick={currentPage === steps.length - 1 ? handleExport : handleNext} disabled={(currentPage === 0 && !uploadedFiles) || (currentPage === 0 && !!uploadedFiles && uploadedFiles.length === 0)}>
+          {currentPage === steps.length - 1 ? 'Export as OBJ' : 'Next'}
         </Button>
       </CardFooter>
     </div>

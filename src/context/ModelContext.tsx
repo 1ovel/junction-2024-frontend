@@ -12,6 +12,8 @@ interface ModelContextType {
   floorHeight: number;
   setFloorGroups: React.Dispatch<React.SetStateAction<THREE.Group[]>>;
   floorGroups: THREE.Group[];
+  setObject3d: React.Dispatch<React.SetStateAction<THREE.Object3D | null>>;
+  object3d: THREE.Object3D | null;
 }
 
 const ModelContext = createContext<ModelContextType | undefined>(undefined);
@@ -21,9 +23,10 @@ export const ModelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [numberOfFloors, setNumberOfFloors] = useState<number>(0)
   const [floorHeight, setFloorHeight] = useState<number>(10)
   const [floorGroups, setFloorGroups] = useState<THREE.Group[]>([]);
+  const [object3d, setObject3d] = useState<THREE.Object3D | null>(null);
 
   return (
-    <ModelContext.Provider value={{ model, setModel, numberOfFloors, setNumberOfFloors, floorHeight, setFloorHeight, floorGroups, setFloorGroups }}>
+    <ModelContext.Provider value={{ object3d, setObject3d, model, setModel, numberOfFloors, setNumberOfFloors, floorHeight, setFloorHeight, floorGroups, setFloorGroups }}>
       {children}
     </ModelContext.Provider>
   );

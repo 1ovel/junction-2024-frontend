@@ -8,7 +8,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { useFileContext } from '@/context/FileContext';
 
 const ModelViewer: React.FC = () => {
-    const { model, setModel, numberOfFloors, setNumberOfFloors, floorHeight, setFloorGroups, floorGroups } = useModelContext();
+    const { object3d, setObject3d, model, setModel, numberOfFloors, setNumberOfFloors, floorHeight, setFloorGroups, floorGroups } = useModelContext();
     const { finalSvgs, serverReturned } = useFileContext();
     const divRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
@@ -93,7 +93,7 @@ const ModelViewer: React.FC = () => {
     useEffect(() => {
         if (!serverReturned) return;
 
-        let groups = [];
+        let groups: THREE.Group[] = [];
 
         finalSvgs.current.forEach((svg, idx) => {
             console.log(svg);
@@ -122,7 +122,7 @@ const ModelViewer: React.FC = () => {
                     material.transparent = true;
                     material.opacity = 0.7;
                     const mesh = new THREE.Mesh(geometry, material);
-                    mesh.position.set(0, 0, (idx + 1) * 100);
+                    mesh.position.set(0, 0, (idx + 1) * 50);
 
                     group.add(mesh);
                 });
@@ -139,6 +139,7 @@ const ModelViewer: React.FC = () => {
             console.log(cameraRef.current?.rotation);
 
             // reader.readAsText(model); // Read the model file as text
+            setObject3d(sceneRef.current!);
         });
 
         setFloorGroups(groups);
