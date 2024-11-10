@@ -5,7 +5,7 @@ import { useModelContext } from "@/context/ModelContext"
 
 
 export default function ModelView() {
-  const { floorHeight, setFloorHeight } = useModelContext()
+  const { floorHeight, setFloorHeight, floorGroups, setFloorGroups } = useModelContext()
 
   return (
     <div className="space-y-4 w-full">
@@ -21,6 +21,17 @@ export default function ModelView() {
               {floorHeight}
             </span>
           </div>
+          {floorGroups.map((group, index) => (
+            <div key={index} className="flex items-center justify-between">
+              <label htmlFor="slider" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Floor {index + 1}
+              </label>
+              <span className="w-12 rounded-md border border-transparent px-2 py-0.5 text-right text-md font-bold text-muted-foreground hover:border-border">
+                {floorHeight}
+              </span>
+              <button onClick={() => { floorGroups[index].visible = !floorGroups[index].visible; setFloorGroups(floorGroups) }}>click me</button>
+            </div>
+          ))}
           <Slider
             id="slider"
             max={100}

@@ -1,16 +1,21 @@
 'use client'
 
 import { useModelContext } from '@/context/ModelContext';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const ModelViewer: React.FC = () => {
-    const { model, setModel, numberOfFloors, setNumberOfFloors } = useModelContext();
+    const { model, setModel, numberOfFloors, setNumberOfFloors, floorHeight, setFloorGroups, floorGroups } = useModelContext();
     const divRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
     const loaderRef = useRef<SVGLoader | null>(null);
+    const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+    const controlsRef = useRef<OrbitControls | null>(null);
+
+
+    const scaledFloorHeight = floorHeight;
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -28,6 +33,7 @@ const ModelViewer: React.FC = () => {
             scene.background = new THREE.Color(0xffffff);
             const camera = new THREE.PerspectiveCamera(50, divRef.current.clientWidth / divRef.current.clientHeight, 0.1, 10000);
             camera.position.z = 150;
+            cameraRef.current = camera;
             // camera.position.x = 500;
             // camera.position.y = 500;
             const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -42,6 +48,7 @@ const ModelViewer: React.FC = () => {
             scene.add(light);
 
             const controls = new OrbitControls(camera, renderer.domElement); // Initialize OrbitControls
+            controlsRef.current = controls;
 
             const animate = () => {
                 requestAnimationFrame(animate);
@@ -58,6 +65,20 @@ const ModelViewer: React.FC = () => {
             };
         }
     }, []);
+
+    useEffect(() => {
+        if (!sceneRef.current) return;
+
+        sceneRef.current.children.forEach((child) => {
+            if (child instanceof THREE.Group) {
+                sceneRef.current!.remove(child);
+            }
+        });
+
+        floorGroups.forEach((group) => {
+            sceneRef.current!.add(group);
+        });
+    }, [floorGroups]);
 
     useEffect(() => {
         if (!model) return;
@@ -97,19 +118,40 @@ const ModelViewer: React.FC = () => {
                     const mesh = new THREE.Mesh(geometry, material);
                     mesh.position.set(0, 0, numberOfFloors * 100);
 
-                    // scene.add(mesh);
                     group.add(mesh);
                 });
             });
 
+            setFloorGroups([...floorGroups, group]);
             sceneRef.current!.add(group);
+            const bb = new THREE.Box3().setFromObject(group);
+            cameraRef.current?.position.set(2 * bb.min.x - bb.max.x, 2 * bb.min.y - bb.max.y, group.position.z);
+            cameraRef.current?.lookAt(group.position);
+            controlsRef.current?.target.set(group.position.x, group.position.y, group.position.z);
+            controlsRef.current?.update();
+            // controlsRef.current?
+            // Controls.l
+            // cameraRef.current?.rotateZ(0);
+            // cameraRef.current?.rotateX(0);
+            // cameraRef.current?.rotateY(0);
+            console.log(cameraRef.current);
         };
 
         reader.readAsText(model); // Read the model file as text
     }, [model]);
 
+    useEffect(() => {
+        console.log(scaledFloorHeight);
+        console.log(sceneRef.current);
+
+        if (sceneRef.current) {
+            sceneRef.current!.scale.set(1, 1, scaledFloorHeight);
+        }
+    }, [scaledFloorHeight]);
+
     return (
         <>
+
             <input type="file" accept=".svg" onChange={handleFileChange} />
             <div className='w-full flex-grow h-full' ref={divRef} />
         </>
