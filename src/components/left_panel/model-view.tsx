@@ -1,5 +1,5 @@
-
 'use client'
+
 import { Slider } from "@/components/ui/slider"
 import { useModelContext } from "@/context/ModelContext"
 
@@ -22,14 +22,11 @@ export default function ModelView() {
             </span>
           </div>
           {floorGroups.map((group, index) => (
-            <div key={index} className="flex items-center justify-between">
-              <label htmlFor="slider" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Floor {index + 1}
-              </label>
-              <span className="w-12 rounded-md border border-transparent px-2 py-0.5 text-right text-md font-bold text-muted-foreground hover:border-border">
-                {floorHeight}
-              </span>
-              <button onClick={() => { floorGroups[index].visible = !floorGroups[index].visible; setFloorGroups(floorGroups) }}>click me</button>
+            <div key={index} className="flex space-between space-x-3">
+              <span className="text-2xl font-bold text-blue-500 font-medium">Floor {index + 1}</span>
+              <button className="font-bold font-medium text-xl border" onClick={() => { floorGroups[index].visible = !floorGroups[index].visible; setFloorGroups(floorGroups) }}>
+                {floorGroups[index].visible ? '✓' : ' '}
+              </button>
             </div>
           ))}
           <Slider

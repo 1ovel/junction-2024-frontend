@@ -5,9 +5,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { useFileContext } from '@/context/FileContext';
 
 const ModelViewer: React.FC = () => {
     const { model, setModel, numberOfFloors, setNumberOfFloors, floorHeight, setFloorGroups, floorGroups } = useModelContext();
+    const { finalSvgs, serverReturned } = useFileContext();
     const divRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
     const loaderRef = useRef<SVGLoader | null>(null);
@@ -89,19 +91,13 @@ const ModelViewer: React.FC = () => {
     }, [floorGroups]);
 
     useEffect(() => {
-        if (!model) return;
+        if (!serverReturned) return;
 
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const svgText = event.target?.result as string;
-            const paths = loaderRef.current!.parse(svgText).paths;
+        finalSvgs.current.forEach((svg) => {
+            console.log(svg);
+            const paths = loaderRef.current!.parse(svg).paths;
 
             console.log(paths); // Debugging: Check if paths are loaded
-
-            // Clear previous meshes before adding new ones
-            // while (sceneRef.current!.children.length > 0) {
-            //     sceneRef.current!.remove(sceneRef.current!.children[0]);
-            // }
 
             const group = new THREE.Group();
 
@@ -141,10 +137,10 @@ const ModelViewer: React.FC = () => {
             controlsRef.current?.update();
             console.log(cameraRef.current?.position);
             console.log(cameraRef.current?.rotation);
-        };
 
-        reader.readAsText(model); // Read the model file as text
-    }, [model]);
+            // reader.readAsText(model); // Read the model file as text
+        });
+    }, [serverReturned]);
 
     useEffect(() => {
         console.log(scaledFloorHeight);
