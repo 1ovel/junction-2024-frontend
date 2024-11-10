@@ -76,10 +76,10 @@ const ModelViewer: React.FC = () => {
             animate();
 
 
-            return () => {
-                renderer.dispose();
-                divRef.current?.removeChild(renderer.domElement);
-            };
+            // return () => {
+            //     renderer.dispose();
+            //     divRef.current?.removeChild(renderer.domElement);
+            // };
         }
     }, [cameraRef.current?.position]);
 
