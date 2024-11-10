@@ -48,23 +48,31 @@ const ModelViewer: React.FC = () => {
             scene.add(light);
 
             const controls = new OrbitControls(camera, renderer.domElement); // Initialize OrbitControls
+            // controls.minAzimuthAngle = -Math.PI / 2; // Limit the rotation of the camera
+            // controls.maxAzimuthAngle = -Math.PI / 2; // Limit the rotation of the camera
+            cameraRef.current.up.set(0, 0, -1);
+
+            // controls.minPolarAngle = -Math.PI / 2; // Limit the rotation of the camera
+            // controls.maxPolarAngle = -Math.PI / 2; // Limit the rotation of the camera
             controlsRef.current = controls;
+
+
+            sceneRef.current = scene;
 
             const animate = () => {
                 requestAnimationFrame(animate);
                 controls.update(); // Update controls on each frame
-                renderer.render(scene, camera);
+                renderer.render(sceneRef.current, cameraRef.current);
             };
             animate();
 
-            sceneRef.current = scene;
 
             return () => {
                 renderer.dispose();
                 divRef.current?.removeChild(renderer.domElement);
             };
         }
-    }, []);
+    }, [cameraRef.current?.position]);
 
     useEffect(() => {
         if (!sceneRef.current) return;
@@ -125,16 +133,14 @@ const ModelViewer: React.FC = () => {
             setFloorGroups([...floorGroups, group]);
             sceneRef.current!.add(group);
             const bb = new THREE.Box3().setFromObject(group);
-            cameraRef.current?.position.set(2 * bb.min.x - bb.max.x, 2 * bb.min.y - bb.max.y, group.position.z);
-            cameraRef.current?.lookAt(group.position);
-            controlsRef.current?.target.set(group.position.x, group.position.y, group.position.z);
+            const mp = group.children.map((child) => child.position.z).reduce((a, b) => a + b, 0) / group.children.length;
+            console.log(mp);
+            cameraRef.current?.position.set(-100, -100, mp);
+            cameraRef.current?.lookAt(new THREE.Vector3(0, 0, mp));
+            cameraRef.current?.updateProjectionMatrix();
             controlsRef.current?.update();
-            // controlsRef.current?
-            // Controls.l
-            // cameraRef.current?.rotateZ(0);
-            // cameraRef.current?.rotateX(0);
-            // cameraRef.current?.rotateY(0);
-            console.log(cameraRef.current);
+            console.log(cameraRef.current?.position);
+            console.log(cameraRef.current?.rotation);
         };
 
         reader.readAsText(model); // Read the model file as text
