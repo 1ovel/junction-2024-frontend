@@ -21,7 +21,7 @@ const ModelContext = createContext<ModelContextType | undefined>(undefined);
 export const ModelProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [model, setModel] = useState<File | null>(null);
   const [numberOfFloors, setNumberOfFloors] = useState<number>(0)
-  const [floorHeight, setFloorHeight] = useState<number>(10)
+  const [floorHeight, setFloorHeight] = useState<number>(4)
   const [floorGroups, setFloorGroups] = useState<THREE.Group[]>([]);
   const [object3d, setObject3d] = useState<THREE.Object3D | null>(null);
 

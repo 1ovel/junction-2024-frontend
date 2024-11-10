@@ -27,7 +27,7 @@ export default function FloorPlanWizard() {
     rasterizedImages.current.forEach((img, i) => {
       formData.append("image", new Blob([img], { type: "image/png" })); // Assuming you have a file input element
 
-      fetch("http://localhost:5000/vectorize", {
+      fetch("https://junction-vectorizer.kuchta.dev/vectorize", {
         method: "POST",
         body: formData
       })
