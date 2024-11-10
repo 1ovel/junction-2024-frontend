@@ -8,9 +8,11 @@
     "start": "next start",
     "lint": "next lint"
   },
+
   "dependencies": {
     "@radix-ui/react-slider": "^1.2.1",
     "@radix-ui/react-slot": "^1.1.0",
+    "@techstark/opencv-js": "^4.10.0-release.1",
     "canvas": "^2.11.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

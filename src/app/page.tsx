@@ -1,5 +1,5 @@
-'use client'
 
+"use client"
 import FloorPlanWizard from '@/components/floor-plan-wizard';
 import FloorPlanEditor from '@/components/right_panel/floor-plan-editor';
 import ModelViewer from '@/components/right_panel/model-viewer';
