@@ -15,14 +15,17 @@ export default function FloorPlanEditor() {
         const [drawing, setDrawing] = useState(false); // Track if the user is currently drawing
         const canvasRef = useRef<any>(null);
         const lastPosition = useRef({ x: 0, y: 0 }); // Store the last position of the pointer
-        const images = useRef([null, null, null]);
-
+        const { rasterizedImages } = useFileContext();
+        useEffect(() => {
+          rasterizedImages.current =  new Array(processedFiles?.length).fill(null);
+        }, [])
+        
         // Function to save the current canvas state as a data URL
         function saveCanvasState() {
                 const canvas = canvasRef.current;
                 const dataUrl = canvas.toDataURL();
                 if (selectedProcessedFile !== null) {
-                        images.current[selectedProcessedFile] = dataUrl; // Save the data URL to images array
+                        rasterizedImages.current[selectedProcessedFile] = dataUrl; // Save the data URL to images array
                 }
         }
 
@@ -33,24 +36,22 @@ export default function FloorPlanEditor() {
                 const img = new Image();
                 img.src = dataUrl;
                 img.onload = () => {
-                        const scaleFactor = canvas.width / img.width;
-                        const newHeight = divRef.current?.clientHeight;
                         
-                        canvas.width = divRef.current?.clientWidth; // Set canvas width
-                        canvas.height = divRef.current?.clientHeight; // Set canvas height based on scaling factor
+                        // canvas.width = divRef.current?.clientWidth; // Set canvas width
+                        // canvas.height = divRef.current?.clientHeight; // Set canvas height based on scaling factor
 
                         // Draw the image on the canvas
-                        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-                        ctx.drawImage(img, 0, 0, canvas.width, newHeight);
+                        // ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 };
         }
 
         useEffect(() => {
                 if (selectedProcessedFile === null || !processedFiles || processedFiles.length === 0) return;
 
-                if (images.current[selectedProcessedFile] != null) {
+                if (rasterizedImages.current[selectedProcessedFile] != null) {
                         // Use saved canvas data URL if it exists
-                        setCanvasFromData(images.current[selectedProcessedFile]);
+                        setCanvasFromData(rasterizedImages.current[selectedProcessedFile]);
 
                 } else {
                         // Load image from file and save it
@@ -109,7 +110,7 @@ export default function FloorPlanEditor() {
 
                                 // Display the final image on the canvas and save it as a data URL
                                 cv.imshow(canvas, closed);
-                                images.current[selectedProcessedFile] = canvas.toDataURL();
+                                rasterizedImages.current[selectedProcessedFile] = canvas.toDataURL();
     var dataURL = canvas.toDataURL();
 
     // Convert the canvas data URL to an SVG string
