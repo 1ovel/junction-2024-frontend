@@ -1,6 +1,6 @@
 
 'use client'
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 interface FileContextType {
   selectedFile: number | null;
@@ -9,9 +9,13 @@ interface FileContextType {
   setUploadedFiles: React.Dispatch<React.SetStateAction<File[] | null>>;
   processedFiles: File[] | null;
   setProcessedFiles: React.Dispatch<React.SetStateAction<File[] | null>>;
+  finalSvgs: React.MutableRefObject<(String | null)[]>;
   removeFile: (index: number) => void;
   selectedProcessedFile: number | null;
+  serverReturned: boolean;
+  setServerReturned: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedProcessedFile: React.Dispatch<React.SetStateAction<number | null>>;
+  rasterizedImages: React.MutableRefObject<(String | null)[]>;
 }
 
 const FileContext = createContext<FileContextType | undefined>(undefined);
@@ -21,6 +25,9 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [processedFiles, setProcessedFiles] = useState<File[] | null>(null);
   const [selectedProcessedFile, setSelectedProcessedFile] = useState<number | null>(0); 
   const [selectedFile, setSelectedFile] = useState<number | null>(null);
+  const [serverReturned, setServerReturned] = useState<boolean>(false);
+  const rasterizedImages = useRef<(String | null)[]>([]);
+  const finalSvgs = useRef<(String | null)[]>([]);
   const [model, setModel] = useState<File | null>(null);
 
   useEffect(() => {
@@ -37,7 +44,7 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   return (
-    <FileContext.Provider value={{ uploadedFiles, setUploadedFiles, removeFile, selectedFile, setSelectedFile, processedFiles, setProcessedFiles, selectedProcessedFile, setSelectedProcessedFile }}>
+    <FileContext.Provider value={{ uploadedFiles, setUploadedFiles, removeFile, selectedFile, setSelectedFile, processedFiles, setProcessedFiles, selectedProcessedFile, setSelectedProcessedFile, finalSvgs, rasterizedImages, serverReturned, setServerReturned}}>
       {children}
     </FileContext.Provider>
   );
