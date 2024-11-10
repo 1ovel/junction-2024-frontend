@@ -37,7 +37,7 @@ export default function FloorPlanWizard() {
         .then(text => {
           // Create a link element to download the SVG file
           finalSvgs.current[i] = text
-          console.log(finalSvgs.current)
+          console.log('current finalsvgs' + + finalSvgs.current);
           returned += 1
           if (returned == rasterizedImages.current.length) {
             console.log('setting srvret true');

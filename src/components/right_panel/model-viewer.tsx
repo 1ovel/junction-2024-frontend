@@ -19,13 +19,13 @@ const ModelViewer: React.FC = () => {
 
     const scaledFloorHeight = floorHeight;
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            setModel(file); // Update the model state with the selected file
-            setNumberOfFloors(numberOfFloors + 1)
-        }
-    };
+    // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const file = event.target.files?.[0];
+    //     if (file) {
+    //         setModel(file); // Update the model state with the selected file
+    //         setNumberOfFloors(numberOfFloors + 1)
+    //     }
+    // };
 
     useEffect(() => {
         if (divRef.current && !sceneRef.current) {
@@ -52,7 +52,7 @@ const ModelViewer: React.FC = () => {
             const controls = new OrbitControls(camera, renderer.domElement); // Initialize OrbitControls
             // controls.minAzimuthAngle = -Math.PI / 2; // Limit the rotation of the camera
             // controls.maxAzimuthAngle = -Math.PI / 2; // Limit the rotation of the camera
-            cameraRef.current.up.set(0, 0, -1);
+            cameraRef.current.up.set(0, 0, 1);
 
             // controls.minPolarAngle = -Math.PI / 2; // Limit the rotation of the camera
             // controls.maxPolarAngle = -Math.PI / 2; // Limit the rotation of the camera
@@ -93,7 +93,9 @@ const ModelViewer: React.FC = () => {
     useEffect(() => {
         if (!serverReturned) return;
 
-        finalSvgs.current.forEach((svg) => {
+        let groups = [];
+
+        finalSvgs.current.forEach((svg, idx) => {
             console.log(svg);
             const paths = loaderRef.current!.parse(svg).paths;
 
@@ -120,26 +122,26 @@ const ModelViewer: React.FC = () => {
                     material.transparent = true;
                     material.opacity = 0.7;
                     const mesh = new THREE.Mesh(geometry, material);
-                    mesh.position.set(0, 0, numberOfFloors * 100);
+                    mesh.position.set(0, 0, (idx + 1) * 100);
 
                     group.add(mesh);
                 });
             });
 
-            setFloorGroups([...floorGroups, group]);
-            sceneRef.current!.add(group);
-            const bb = new THREE.Box3().setFromObject(group);
-            const mp = group.children.map((child) => child.position.z).reduce((a, b) => a + b, 0) / group.children.length;
-            console.log(mp);
-            cameraRef.current?.position.set(-100, -100, mp);
-            cameraRef.current?.lookAt(new THREE.Vector3(0, 0, mp));
-            cameraRef.current?.updateProjectionMatrix();
+            groups.push(group);
+            sceneRef.current!.add(...groups);
+            const bb = new THREE.Box3().setFromObject(sceneRef.current!);
+            let a = new THREE.Vector3();
+            bb.getCenter(a)
+            cameraRef.current?.lookAt(a);
             controlsRef.current?.update();
             console.log(cameraRef.current?.position);
             console.log(cameraRef.current?.rotation);
 
             // reader.readAsText(model); // Read the model file as text
         });
+
+        setFloorGroups(groups);
     }, [serverReturned]);
 
     useEffect(() => {
@@ -152,12 +154,7 @@ const ModelViewer: React.FC = () => {
     }, [scaledFloorHeight]);
 
     return (
-        <>
-
-            <input type="file" accept=".svg" onChange={handleFileChange} />
-            <div className='w-full flex-grow h-full' ref={divRef} />
-        </>
-
+        <div className='w-full flex-grow h-full' ref={divRef} />
     );
 };
 
