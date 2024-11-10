@@ -37,7 +37,7 @@ export default function ImageUpload() {
         <input {...getInputProps()} id="file-upload" />
         <div className="flex flex-col items-center justify-center text-center">
           <Upload className="w-12 h-12 mb-4 text-muted-foreground" />
-          <p className="text-lg font-medium">Drag & drop your PNG files here</p>
+          <p className="text-lg font-medium">Drag & drop your SVG files here</p>
           <p className="text-sm text-muted-foreground">or click to select files</p>
         </div>
       </Card>
