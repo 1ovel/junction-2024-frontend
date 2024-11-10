@@ -1,5 +1,5 @@
-
 'use client'
+
 import { Slider } from "@/components/ui/slider"
 import { useModelContext } from "@/context/ModelContext"
 
