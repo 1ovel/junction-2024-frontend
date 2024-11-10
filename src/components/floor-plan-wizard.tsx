@@ -51,7 +51,7 @@ export default function FloorPlanWizard() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto h-full">
+    <div className="w-full max-w-4xl mx-auto sticky top-0">
       <CardHeader>
         <CardTitle>Floor Plan to 3D Model</CardTitle>
       </CardHeader>

@@ -1,5 +1,6 @@
 'use client'
 
+import cv from "@techstark/opencv-js";
 import { useEditorContext } from '@/context/EditorContext';
 import { useFileContext } from '@/context/FileContext';
 import { Eraser, Pen } from 'lucide-react';
@@ -50,6 +51,7 @@ export default function FloorPlanEditor() {
                 if (images.current[selectedProcessedFile] != null) {
                         // Use saved canvas data URL if it exists
                         setCanvasFromData(images.current[selectedProcessedFile]);
+
                 } else {
                         // Load image from file and save it
                         const img = new Image();
@@ -57,17 +59,63 @@ export default function FloorPlanEditor() {
                         img.onload = () => {
                                 // Save the initial canvas state to the array
                                 const canvas = canvasRef.current;
-                                const ctx = canvas.getContext('2d');
 
-                                const scaleFactor = divRef.current!.clientWidth / img.width;
+                                // Load image into OpenCV Mat and adjust dimensions
+                                const src = cv.imread(img);
+                                const adjustedWidth = Math.floor(src.cols / 1.5);
+                                const adjustedHeight = Math.floor(src.rows / 1.5);
 
-                                canvas.width = img.width * scaleFactor; // Set canvas width
-                                canvas.height = divRef.current?.clientHeight; // Set canvas height
+                                // Create a destination Mat with a white background, resized to match adjusted dimensions
+                                const dest = new cv.Mat(adjustedHeight, adjustedWidth, cv.CV_8UC3, new cv.Scalar(255, 255, 255));
+                                cv.resize(src, dest, new cv.Size(adjustedWidth, adjustedHeight), 0, 0, cv.INTER_LINEAR);
+                                src.delete();  // Free up memory for src since it's no longer needed
 
-                                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                // Binarize the image for edge detection
+                                const binaryImage = new cv.Mat();
+                                cv.threshold(dest, binaryImage, 105, 255, cv.THRESH_BINARY);
 
-                                // Save the canvas content as a data URL
+                                // Detect edges using Canny
+                                const edges = new cv.Mat();
+                                cv.Canny(binaryImage, edges, 50, 150, 3);
+                                binaryImage.delete();  // Free binaryImage after use
+
+                                // Use Hough Transform to detect lines
+                                const lines = new cv.Mat();
+                                cv.HoughLinesP(edges, lines, 1, Math.PI / 180, 100, 90, 10);
+                                edges.delete();  // Free edges after line detection
+
+                                // Prepare an empty Mat for drawing lines
+                                const lineImage = new cv.Mat(adjustedHeight, adjustedWidth, cv.CV_8UC3, new cv.Scalar(255, 255, 255));
+
+                                // Draw detected lines on the empty Mat
+                                for (let i = 0; i < lines.rows; ++i) {
+                                        const [x1, y1, x2, y2] = [
+                                                lines.data32S[i * 4],
+                                                lines.data32S[i * 4 + 1],
+                                                lines.data32S[i * 4 + 2],
+                                                lines.data32S[i * 4 + 3],
+                                        ];
+                                        cv.line(lineImage, new cv.Point(x1, y1), new cv.Point(x2, y2), new cv.Scalar(0, 0, 0), 10);
+                                }
+                                lines.delete();  // Free lines after drawing
+
+                                // Apply morphological closing to the line image
+                                const size = 5;
+                                const element = cv.getStructuringElement(cv.MORPH_ELLIPSE, new cv.Size(2 * size + 1, 2 * size + 1));
+                                const closed = new cv.Mat();
+                                cv.morphologyEx(lineImage, closed, cv.MORPH_CLOSE, element);
+                                lineImage.delete();  // Free lineImage after closing
+                                element.delete();  // Free structuring element
+
+                                // Display the final image on the canvas and save it as a data URL
+                                cv.imshow(canvas, closed);
                                 images.current[selectedProcessedFile] = canvas.toDataURL();
+    var dataURL = canvas.toDataURL();
+
+    // Convert the canvas data URL to an SVG string
+                                // Free the remaining Mats
+                                dest.delete();
+                                closed.delete();
                         };
                 }
         }, [selectedProcessedFile, processedFiles]);
@@ -139,7 +187,7 @@ export default function FloorPlanEditor() {
 
         return (
                 <>
-                        <div className='w-full flex gap-2 pb-5'>
+                        <div className='w-full flex gap-2 pb-5 sticky top-4'>
                                 <Button size="icon" variant={tool === "draw" ? "default" : "outline"} onClick={() => setTool("draw")}>
                                         <Pen className="w-4 h-4" />
                                 </Button>

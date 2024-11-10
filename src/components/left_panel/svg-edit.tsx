@@ -1,3 +1,4 @@
+'use client'
 import { useEditorContext } from '@/context/EditorContext';
 import { useFileContext } from '@/context/FileContext';
 import { Slider } from '../ui/slider';
