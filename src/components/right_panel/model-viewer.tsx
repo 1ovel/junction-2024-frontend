@@ -33,8 +33,14 @@ const ModelViewer: React.FC = () => {
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0xffffff);
-            const camera = new THREE.PerspectiveCamera(50, divRef.current.clientWidth / divRef.current.clientHeight, 0.1, 10000);
-            camera.position.z = 150;
+            const camera = new THREE.PerspectiveCamera(50, divRef.current.clientWidth / divRef.current.clientHeight, 0.1, 10000);camera.position.set(-249.21088839875534, -669.2944115862374, 1495.0210107106598);
+            // Set camera rotation
+            camera.rotation.set(
+              1.034004350470264,
+              -0.4502496519920817,
+              -0.2534047815947666,
+              'XYZ'
+            );
             cameraRef.current = camera;
             // camera.position.x = 500;
             // camera.position.y = 500;
@@ -148,13 +154,14 @@ const ModelViewer: React.FC = () => {
     useEffect(() => {
         console.log(scaledFloorHeight);
         console.log(sceneRef.current);
-
+        
         if (sceneRef.current) {
             sceneRef.current!.scale.set(1, 1, scaledFloorHeight);
         }
     }, [scaledFloorHeight]);
 
     return (
+        
         <div className='w-full flex-grow h-full' ref={divRef} />
     );
 };
